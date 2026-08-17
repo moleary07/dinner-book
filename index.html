@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weeknight Dinners — Archive</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:   #FBF7F1;
+      --warm:    #F5EDE0;
+      --tan:     #E8D9C4;
+      --rust:    #C0623A;
+      --rust-lt: #D97F55;
+      --sage:    #6B8F71;
+      --sage-lt: #A8C4AC;
+      --ink:     #2C2416;
+      --muted:   #7A6E5F;
+      --border:  #DDD0BC;
+      --white:   #FFFFFF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .book-header {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 52px 40px 44px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .book-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(192,98,58,.25) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 20%, rgba(107,143,113,.20) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .book-eyebrow {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--rust-lt);
+      margin-bottom: 14px;
+    }
+    .book-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+    .book-title em { color: #A8C4AC; font-style: italic; }
+    .book-subtitle {
+      font-size: .88rem;
+      color: rgba(251,247,241,.5);
+      font-weight: 300;
+    }
+
+    /* ── Main ── */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 52px 24px 80px;
+    }
+
+    .section-heading {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Week cards ── */
+    .week-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .week-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color .2s, box-shadow .2s, transform .15s;
+    }
+    .week-card:hover {
+      border-color: var(--rust-lt);
+      box-shadow: 0 4px 20px rgba(44,36,22,.08);
+      transform: translateY(-1px);
+    }
+    .week-card.current {
+      border-color: var(--rust);
+      background: var(--warm);
+    }
+
+    .week-info {}
+    .week-label {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--rust);
+      margin-bottom: 4px;
+    }
+    .week-card.current .week-label::before {
+      content: '● ';
+      font-size: .5rem;
+      vertical-align: middle;
+    }
+    .week-dates {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 400;
+    }
+    .week-nights {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .week-arrow {
+      font-size: 1.1rem;
+      color: var(--rust-lt);
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<header class="book-header">
+  <p class="book-eyebrow">My Kitchen</p>
+  <h1 class="book-title">Weeknight <em>Dinners</em></h1>
+  <p class="book-subtitle">A running archive of every week's menu</p>
+</header>
+
+<main class="container">
+  <p class="section-heading">All Weeks</p>
+
+  <div class="week-list">
+
+    <!-- Most recent week first -->
+    <a class="week-card current" href="aug-17-2026/weeknight-dinner-book.html">
+      <div class="week-info">
+        <div class="week-label">Current Week</div>
+        <div class="week-dates">August 17 – 21, 2026</div>
+        <div class="week-nights">Tacos · Buffalo Chicken · Corn &amp; Ricotta Pasta · Greek Couscous Bowl · Date Night</div>
+      </div>
+      <div class="week-arrow">→</div>
+    </a>
+
+    <!-- Future weeks will be added above this comment -->
+
+  </div>
+</main>
+
+</body>
+</html>
