@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weeknight Dinners</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:  #FBF7F1;
+      --warm:   #F5EDE0;
+      --tan:    #E8D9C4;
+      --rust:   #C0623A;
+      --rust-lt:#D97F55;
+      --sage:   #6B8F71;
+      --ink:    #2C2416;
+      --muted:  #7A6E5F;
+      --border: #DDD0BC;
+      --white:  #FFFFFF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .book-header {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 52px 40px 44px;
+      text-align: center;
+    }
+    .book-eyebrow {
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--rust-lt);
+      margin-bottom: 14px;
+    }
+    .book-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 400;
+    }
+    .book-title em { color: #A8C4AC; font-style: italic; }
+
+    /* ── Day tabs ── */
+    .day-nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .day-nav::-webkit-scrollbar { display: none; }
+    .day-tab {
+      flex: 0 0 auto;
+      padding: 16px 28px;
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      white-space: nowrap;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+    .day-tab:hover { color: var(--rust); }
+    .day-tab.active { color: var(--rust); border-bottom-color: var(--rust); font-weight: 600; }
+    .day-tab.empty { opacity: .38; cursor: default; }
+    .day-tab.empty:hover { color: var(--muted); }
+
+    /* ── Page ── */
+    .pages { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── Day label ── */
+    .day-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--rust);
+      background: rgba(192,98,58,.10);
+      border: 1px solid rgba(192,98,58,.22);
+      border-radius: 100px;
+      padding: 4px 13px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Recipe title ── */
+    .recipe-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 40px;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Ingredients ── */
+    .ingredient-list { list-style: none; margin-bottom: 44px; }
+    .ingredient-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--tan);
+      font-size: .93rem;
+      line-height: 1.4;
+    }
+    .ingredient-list li:last-child { border-bottom: none; }
+    .amount {
+      font-weight: 600;
+      color: var(--rust);
+      min-width: 64px;
+      flex-shrink: 0;
+    }
+
+    /* ── Instructions ── */
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 24px; }
+    .step { display: grid; grid-template-columns: 36px 1fr; gap: 16px; align-items: start; }
+    .step-number {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--cream);
+      font-size: .8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-text {
+      font-size: .95rem;
+      line-height: 1.75;
+      padding-top: 6px;
+    }
+
+    /* ── Empty state ── */
+    .empty-page {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--muted);
+    }
+    .empty-page .big-icon { font-size: 2.4rem; margin-bottom: 18px; opacity: .35; }
+    .empty-page h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .empty-page p { font-size: .88rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<header class="book-header">
+  <p class="book-eyebrow">My Kitchen</p>
+  <h1 class="book-title">Weeknight <em>Dinners</em></h1>
+</header>
+
+<nav class="day-nav">
+  <button class="day-tab" onclick="showDay('monday')">Monday</button>
+  <button class="day-tab" onclick="showDay('tuesday')">Tuesday</button>
+  <button class="day-tab active"  onclick="showDay('wednesday')">Wednesday</button>
+  <button class="day-tab" onclick="showDay('thursday')">Thursday</button>
+  <button class="day-tab empty" onclick="showDay('friday')">Friday</button>
+</nav>
+
+<main class="pages">
+
+  <!-- MONDAY -->
+  <section id="monday" class="page">
+    <div class="day-label">Monday</div>
+    <h2 class="recipe-name">Instant Pot Chicken Tacos</h2>
+
+    <p class="section-heading">Ingredients</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">3</span> boneless skinless chicken breasts (fresh or frozen)</li>
+      <li><span class="amount">1 oz</span> taco seasoning (1 packet, or 2 tablespoons homemade taco seasoning)</li>
+      <li><span class="amount">⅓ cup</span> chicken broth</li>
+      <li><span class="amount">1 cup</span> salsa</li>
+    </ul>
+
+    <p class="section-heading">For Serving</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">12</span> taco shells or small flour or corn tortillas</li>
+      <li><span class="amount">as desired</span> toppings (tomatoes, lettuce, sour cream, salsa)</li>
+    </ul>
+
+    <p class="section-heading">Instructions</p>
+    <ol class="step-list">
+      <li class="step">
+        <span class="step-number">1</span>
+        <p class="step-text">Place chicken breast in the bottom of the Instant Pot. Add chicken broth.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">2</span>
+        <p class="step-text">Sprinkle taco seasoning over chicken breasts. Top with salsa.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">3</span>
+        <p class="step-text">Press "Poultry" and cook for 15 minutes if frozen and 12 minutes if fresh.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">4</span>
+        <p class="step-text">Once done, release pressure and shred chicken with two forks. Combine with sauce in Instant Pot and serve as desired.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- TUESDAY -->
+  <section id="tuesday" class="page">
+    <div class="day-label">Tuesday</div>
+    <h2 class="recipe-name">Baked Crunchy Honey<br>Buffalo Chicken</h2>
+
+    <p class="section-heading">Ingredients</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">6 cups</span> cornflakes (use gluten-free if needed)</li>
+      <li><span class="amount">¼ cup</span> grated parmesan cheese</li>
+      <li><span class="amount">1 Tbsp</span> smoked paprika</li>
+      <li><span class="amount">1 tsp</span> onion powder</li>
+      <li><span class="amount">1 tsp</span> garlic powder</li>
+      <li><span class="amount">2 large</span> eggs, beaten</li>
+      <li><span class="amount">2 Tbsp</span> hot sauce</li>
+      <li><span class="amount">2 lbs</span> chicken breast or skinless thighs</li>
+      <li><span class="amount">for drizzling</span> extra virgin olive oil</li>
+      <li><span class="amount">for serving</span> blue cheese or ranch dressing</li>
+      <li><span class="amount">for serving</span> sliced green onions</li>
+    </ul>
+
+    <p class="section-heading">Honey Buffalo Sauce</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">½ cup</span> hot sauce</li>
+      <li><span class="amount">6 Tbsp</span> salted butter</li>
+      <li><span class="amount">1–2 tsp</span> seasoned salt</li>
+      <li><span class="amount">¾ tsp</span> chipotle chili powder</li>
+      <li><span class="amount">½ tsp</span> cayenne pepper</li>
+      <li><span class="amount">2 Tbsp</span> honey</li>
+    </ul>
+
+    <p class="section-heading">Instructions</p>
+    <ol class="step-list">
+      <li class="step">
+        <span class="step-number">1</span>
+        <p class="step-text">Preheat the oven to 425° F. Line a baking sheet with parchment paper.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">2</span>
+        <p class="step-text">In a food processor, combine the cornflakes, parmesan, paprika, onion powder, garlic powder, and a pinch of salt. Pulse until you have fine crumbs. Alternatively, you can crush the crumbs in a ziplock bag by stepping on them. Dump the crumbs into a shallow bowl.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">3</span>
+        <p class="step-text">Beat the eggs in a bowl, add the hot sauce and chicken, and toss well to coat.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">4</span>
+        <p class="step-text">Dredge the chicken through the crumbs, covering fully. Place on the prepared baking sheet. For a thicker coating, dip the chicken back through the eggs, then through the crumbs a second time. Place on the prepared baking sheet. Drizzle with olive oil. Bake for 20-25 minutes, until crisp all around.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">5</span>
+        <p class="step-text">Meanwhile, make the sauce. In a saucepan set over medium heat, melt together the hot sauce, butter, seasoned salt, and cayenne. Stir until melted and combined. Remove from the heat and mix in the honey.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">6</span>
+        <p class="step-text">Drizzle the buffalo sauce over the chicken. Top with green onions and blue cheese/ranch dressing. I love this over rice, but it's also great with french fries. Enjoy!</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- WEDNESDAY -->
+  <section id="wednesday" class="page active">
+    <div class="day-label">Wednesday</div>
+    <h2 class="recipe-name">One-Pot Lemon Basil<br>Corn &amp; Ricotta Pasta</h2>
+
+    <p class="section-heading">Ingredients</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">1 lb</span> short-cut pasta</li>
+      <li><span class="amount">1 Tbsp</span> extra virgin olive oil</li>
+      <li><span class="amount">2 Tbsp</span> salted butter</li>
+      <li><span class="amount">4 ears</span> corn, kernels removed</li>
+      <li><span class="amount">2 Tbsp</span> fresh thyme, chopped</li>
+      <li><span class="amount">2 cloves</span> garlic, minced</li>
+      <li><span class="amount">1 tsp</span> crushed red pepper flakes</li>
+      <li><span class="amount">1 cup</span> whole milk ricotta</li>
+      <li><span class="amount">4 oz</span> triple crème brie, cubed</li>
+      <li><span class="amount">¼ cup</span> dry white wine</li>
+      <li><span class="amount">1 cup</span> fresh basil, roughly chopped</li>
+      <li><span class="amount">1</span> lemon — zest &amp; juice</li>
+      <li><span class="amount">to taste</span> kosher salt &amp; black pepper</li>
+    </ul>
+
+    <p class="section-heading">Instructions</p>
+    <ol class="step-list">
+      <li class="step">
+        <span class="step-number">1</span>
+        <p class="step-text">Bring a large pot of salted water to a boil. Boil the pasta to al dente, according to package directions. Reserve 1/2 cup pasta cooking water. Drain.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">2</span>
+        <p class="step-text">In the same pot set over medium-high heat, add the butter, corn, garlic, thyme, and red pepper flakes. Cook another 5 minutes or until the corn is golden. Add the reserved pasta cooking water, wine, ricotta, and brie, stirring until the cheeses are melted and a sauce has formed.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">3</span>
+        <p class="step-text">Stir in the pasta, tossing well to coat. Add the basil, lemon zest, lemon juice, and season with salt and pepper. Remove from the heat and serve immediately topped with additional basil. Enjoy!</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- THURSDAY -->
+  <section id="thursday" class="page">
+    <div class="day-label">Thursday</div>
+    <h2 class="recipe-name">Greek Chicken<br>Couscous Bowl</h2>
+
+    <p class="section-heading">Couscous</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">1 Tbsp</span> olive oil</li>
+      <li><span class="amount">1½ cups</span> Israeli couscous</li>
+      <li><span class="amount">1½ cups</span> chicken stock</li>
+      <li><span class="amount">1 tsp</span> salt</li>
+    </ul>
+
+    <p class="section-heading">Chicken</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">1½ lbs</span> boneless skinless chicken</li>
+      <li><span class="amount">1 recipe</span> Greek chicken marinade (below)</li>
+    </ul>
+
+    <p class="section-heading">Greek Chicken Marinade</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">3 Tbsp</span> olive oil</li>
+      <li><span class="amount">1 Tbsp</span> minced garlic</li>
+      <li><span class="amount">⅓ cup</span> fresh lemon juice</li>
+      <li><span class="amount">1 Tbsp</span> red wine vinegar</li>
+      <li><span class="amount">1 tsp</span> dried oregano</li>
+      <li><span class="amount">1 tsp</span> dried dill</li>
+      <li><span class="amount">½ tsp each</span> dried basil, dried thyme, crushed rosemary, salt</li>
+      <li><span class="amount">1 Tbsp</span> sugar</li>
+      <li><span class="amount">¼ tsp</span> pepper</li>
+      <li><span class="amount">1½ tsp</span> dijon mustard</li>
+    </ul>
+
+    <p class="section-heading">Bowl Toppings</p>
+    <ul class="ingredient-list">
+      <li><span class="amount">1 cup</span> tzatziki</li>
+      <li><span class="amount">2</span> avocados</li>
+      <li><span class="amount">1 cup</span> grape or cherry tomatoes, halved</li>
+      <li><span class="amount">1 cup</span> cucumber, sliced</li>
+      <li><span class="amount">½ cup</span> red onion, sliced</li>
+      <li><span class="amount">½ cup</span> Kalamata olives</li>
+      <li><span class="amount">4</span> lemon wedges</li>
+    </ul>
+
+    <p class="section-heading">Instructions</p>
+    <ol class="step-list">
+      <li class="step">
+        <span class="step-number">1</span>
+        <p class="step-text">Whisk together all of the Greek Marinade ingredients. Reserve half to use as a dressing. Take the other half and pour over chicken, marinate at least 30 minutes.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">2</span>
+        <p class="step-text">In a large skillet, add olive oil, and turn to medium heat. When oil is hot, add couscous, and toast until a nice golden brown. Add chicken stock and turn down to medium low, stir in salt, and cover. Let simmer until liquid is absorbed, about 10–15 minutes.</p>
+      </li>
+      <li class="step">
+        <span class="step-number">3</span>
+        <p class="step-text">Bake or pan cook chicken in marinade until internal temperature reaches 165 degrees (approximately 20 minutes baking time at 350 degrees, or 7 minutes per side cooking stove top).</p>
+      </li>
+      <li class="step">
+        <span class="step-number">4</span>
+        <p class="step-text">Assemble bowls by adding couscous to the bottom of 4 bowls. Divide chicken, tzatziki, avocados, tomatoes, cucumbers, red onion, Kalamata olives, and lemon wedges between the bowls. Drizzle the marinade/dressing over the top and enjoy!</p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="friday" class="page">
+    <div class="empty-page">
+      <div class="big-icon">🌙</div>
+      <h2>Friday's recipe is coming soon</h2>
+      <p>Add a recipe to fill this page.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function showDay(day) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+    const page = document.getElementById(day);
+    if (page) page.classList.add('active');
+    const days = ['monday','tuesday','wednesday','thursday','friday'];
+    document.querySelectorAll('.day-tab')[days.indexOf(day)]?.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
